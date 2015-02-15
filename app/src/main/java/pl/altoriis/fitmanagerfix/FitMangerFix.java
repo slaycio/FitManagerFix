@@ -1,12 +1,16 @@
 package pl.altoriis.fitmanagerfix;
 
+import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import android.content.Context;
 import android.os.Message;
+import com.sec.android.app.shealthlite.datamanager.SHealthLitePedometerManager;
 
 
 import com.sec.android.app.shealthlite.datamanager.SHealthLiteSyncManager;
+import com.sec.android.app.shealthlite.service.SHealthService;
+import com.sec.android.app.shealthlite.service.SHealthWatchdog;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -42,20 +46,28 @@ public class FitMangerFix implements IXposedHookLoadPackage {
             //szukanie
             String[][] lista = new String[1][2];
 
-            lista[0][0] = "com.sec.android.app.shealthlite.dashboard.SHealthLiteDashboard";
-            lista[0][1] = "action_sync_now";
+            lista[0][0] = "com.sec.android.app.shealthlite.service.SHealthService";
+            lista[0][1] = "get_mode";
+
+        //request_latest_data_send   - znajduje ale nie uruchamia jej
+        //get_mode
+        //getInstance
+
+
+
+
 
             for(final String[] x : lista) {
 
-                boolean bSHealthLiteDashboardExists = false;
+                boolean bExists = false;
                 try {
 
-                    bSHealthLiteDashboardExists = XposedHelpers.findClass("com.sec.android.app.shealthlite.dashboard.SHealthLiteDashboard"
+                    bExists = XposedHelpers.findClass(x[0]
                             , lpparam.classLoader) == null ? false : true;
                 } catch (Exception e) {
                     XposedBridge.log("nie ma klasy nie ma");
 
-                } 
+                }
 /*
                 try {
                     XposedBridge.log("proba" + x[0] + ":::" + x[1]);
@@ -67,8 +79,8 @@ public class FitMangerFix implements IXposedHookLoadPackage {
                 }
 */
 
-                if (bSHealthLiteDashboardExists) {
-                    XposedBridge.log("bSHealthLiteDashboardExists");
+                if (bExists) {
+                    XposedBridge.log("bExists");
                     try {
 
                         XposedBridge.log("a teraz TRY");
@@ -78,6 +90,9 @@ public class FitMangerFix implements IXposedHookLoadPackage {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                                 // this will be called before the clock was updated by the original method
+
+
+
                                 XposedBridge.log(x[0] + "przed");
 
                             }
@@ -87,9 +102,12 @@ public class FitMangerFix implements IXposedHookLoadPackage {
                                 // this will be called after the clock was updated by the original method
 
 
-                                SHealthLiteSyncManager mProgress = (SHealthLiteSyncManager) getObjectField(param.thisObject, "mProgress");
+                              //  Object result = XposedHelpers.callMethod(param.thisObject, "do_sync_pedometer_prepare");
 
-                                Object state = XposedHelpers.callMethod(mCM, "getState");
+                               // XposedBridge.log("test1" + result.getClass().toString());
+                                XposedBridge.log("test2"+ param.thisObject.getClass().toString());
+                                XposedBridge.log("test3" + param.getResult().toString());
+                               // param.setResult(0);
 
 
 

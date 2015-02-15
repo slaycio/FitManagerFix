@@ -25,4 +25,5 @@ dependencies {
     provided files('lib/XposedBridgeApi-54.jar')
     provided files('lib/fmanager1.92.jar')
     provided files('lib/shealth.jar')
+    provided files('lib/healthService064.jar')
 }
